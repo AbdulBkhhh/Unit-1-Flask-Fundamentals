@@ -1,4 +1,5 @@
 from flask import Flask, request
+from markupsafe import escape
 
 app = Flask(__name__)
 
@@ -20,6 +21,13 @@ def home():
                     </ul>
                 </li>
             </ul>
+                <li> Filter: 
+                    <ul> 
+                        <li><a href="/filter">/filter</a></li>
+                        <li><a href="/filter?category=books&category=tech&sort=price">/products?category=tech&sort=price</a></li>
+                    </ul>
+                </li>
+            </ul>
 """
 
 
@@ -34,8 +42,15 @@ def search():
 def products():
     page = request.args.get("page", "1", type=int)
     price = request.args.get("max_price", type=float)
-    return f"Page:{page} (type: {type(page)}), Max Price:{price}"
+    return escape(f"Page:{page} (type: {type(page)}), Max Price:{price} (type: {type(price)})")
+
+@app.route("/filter")
+def filter_stuff():
+    sort = request.args.get('sort', 'Name')
+    categories = request.args.getlist('category')
+    
+    return f"Sort: {sort}, Categories: {categories}"
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5050)
